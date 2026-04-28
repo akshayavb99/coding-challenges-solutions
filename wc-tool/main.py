@@ -112,6 +112,24 @@ def count_words(filepath, chunk_size=8192):
 
     return count
 
+def count_characters(filepath, chunk_size=8192):
+    """
+     Count the number of characters in a file.
+
+     Args:
+         filepath (str): Path to the file to measure.
+
+     Returns:
+         int: Total number of characters (Unicode code points).
+     """
+    count = 0
+
+    with open(filepath, "rb") as f:
+        while chunk := f.read(chunk_size):
+            count += len(chunk.decode("utf-8", errors="replace"))
+
+    return count
+
 # Entry point
 if __name__ == "__main__":
     main()
