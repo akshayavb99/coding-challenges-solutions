@@ -1,6 +1,6 @@
 # Working Document - Build your own `wc` tool
 
-Generated with the help of CLAUDE chat
+File structure generated with the help of CLAUDE chat
 
 **John Crickett's Coding Challenges**
 
@@ -120,7 +120,7 @@ _List each step from the challenge as a requirement. Add sub-bullets for specifi
 - **Description:** Write a simple version of the `wc` tool which takes the command option `-m` that outputs the number of characters in a file.
 - **Acceptance Criteria:**
   - Input: `ccwc -m test.txt`
-  - Expected Output: `342190 test.txt`
+  - Expected Output: `339292 test.txt`
 
 ### Step 5
 
@@ -160,7 +160,7 @@ main.py       — Entry point, argument parsing, File / stdin reading logic, Pri
 
 | Requirement        | Detail                                              |
 | ------------------ | --------------------------------------------------- |
-| **Dependencies**   | e.g. stdlib only / list any third-party libs        |
+| **Dependencies**   | stdlib only                                         |
 | **Platform**       | cross-platform                                      |
 | **Performance**    | e.g. must handle files up to 1 GB without crashing  |
 | **Error Handling** | Exit with non-zero code on failure; print to stderr |
@@ -248,18 +248,22 @@ _If this were production code, what would change?_
 ## 12. References & Resources
 
 - **Challenge URL:** `https://codingchallenges.fyi/challenges/challenge-wc`
-- **Reference Tool Man Page:** e.g. `man wc`
-- **RFC / Spec (if applicable):** e.g. RFC 2616 for HTTP
+- **Reference Tool Man Page:**
+  - `man wc`
+  - https://realpython.com/read-write-files-python
+  - https://realpython.com/working-with-files-in-python/
+- **RFC / Spec (if applicable):**
 - **Inspiration / Prior Art:** _Any repos, blog posts, or docs consulted_
 
 ---
 
 ## 13. Progress Log
 
-| Date       | Time Spent | Notes                                                                                                                                      |
-| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --- |
-| 2026-04-27 | 1h 0m      | Started Step 0 — Basic setup, fill initial information in PRD                                                                              |
-| 2026-04-28 | 1h 15m     | Completed Step 1 (Count number of bytes) and Step 2 (Count number of lines), along with `uv` based tool setup steps and the initial README |     |
+| Date       | Time Spent | Notes                                                                                                                                       |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-27 | 1h 0m      | Started Step 0 — Basic setup, filled initial information in PRD                                                                             |
+| 2026-04-28 | 1h 15m     | Completed Step 1 (Count number of bytes) and Step 2 (Count number of lines), along with `uv` based tool setup steps and initial README      |
+| 2026-04-28 | 1h 0m      | Completed Step 3 (Count number of words) and Step 4 (Count number of characters), along with `uv` based tool setup steps and initial README |
 
 **Total Time:** ~X hours
 
