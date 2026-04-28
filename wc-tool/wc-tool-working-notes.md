@@ -1,5 +1,7 @@
 # Working Document - Build your own `wc` tool
 
+Generated with the help of CLAUDE chat
+
 **John Crickett's Coding Challenges**
 
 ---
@@ -255,11 +257,9 @@ _If this were production code, what would change?_
 ## 13. Progress Log
 
 | Date       | Time Spent | Notes                                                                                                                                      |
-| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --- |
 | 2026-04-27 | 1h 0m      | Started Step 0 — Basic setup, fill initial information in PRD                                                                              |
-| 2026-04-28 | 1h 15m     | Completed Step 1 (Count number of bytes) and Step 2 (Count number of lines), along with `uv` based tool setup steps and the initial README |
-| YYYY-MM-DD | Xh Ym      | Step 2 complete — line and word count added                                                                                                |
-| YYYY-MM-DD | Xh Ym      | All steps done                                                                                                                             |
+| 2026-04-28 | 1h 15m     | Completed Step 1 (Count number of bytes) and Step 2 (Count number of lines), along with `uv` based tool setup steps and the initial README |     |
 
 **Total Time:** ~X hours
 
