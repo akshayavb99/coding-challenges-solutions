@@ -1,0 +1,10 @@
+[project]
+name = "wc-tool"
+version = "0.1.0"
+description = "Simple wc clone for counting bytes"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+ccwc = "main:main"
