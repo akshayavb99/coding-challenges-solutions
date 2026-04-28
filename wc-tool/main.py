@@ -8,54 +8,6 @@
 
 import argparse # Needed to receive and process the input arguments
 
-def main():
-    """
-     Entry point for the wc-tool CLI.
-
-     Parses command-line arguments and dispatches to the appropriate
-     counting function. Prints results to stdout.
-     """
-    # Define argument parser
-    parser = argparse.ArgumentParser(description="Hello from wc-tool!")
-    
-    # Add flags
-    parser.add_argument("-c", "--bytes", action="store_true", help="Count bytes")
-    parser.add_argument("-l", "--lines", action="store_true", help="Count number of lines")
-    parser.add_argument("-w", "--words", action="store_true", help="Count number of words")
-    parser.add_argument("-m", "--characters", action="store_true", help="Count number of characters")
-    
-    # Add argument for taking filename as input
-    parser.add_argument("file", help="File to process")
-    
-    # Parse the arguments
-    args = parser.parse_args()
-    
-    # Get the required results
-    result = []
-    if args.bytes:
-        size = count_bytes(args.file)
-        result.append(str(size))
-        #print(f"{size} {args.file}")
-    
-    if args.lines:
-        line_count = count_lines(args.file)
-        result.append(str(line_count))
-        #print(f"{line_count} {args.file}")
-    
-    if args.words:
-        word_count = count_words(args.file)
-        result.append(str(word_count))
-        #print(f"{word_count} {args.file}") 
-    
-    if args.characters:
-        char_count = count_characters(args.file)
-        result.append(str(char_count))
-        #print(f"{char_count} {args.file}")
-    
-    print(" ".join(result) + " " + args.file)
-        
-    
-
 def count_bytes(filepath):
     """
      Count the number of bytes in a file.
@@ -129,6 +81,63 @@ def count_characters(filepath, chunk_size=8192):
             count += len(chunk.decode("utf-8", errors="replace"))
 
     return count
+
+def main():
+    """
+     Entry point for the wc-tool CLI.
+
+     Parses command-line arguments and dispatches to the appropriate
+     counting function. Prints results to stdout.
+     """
+    # Define argument parser
+    parser = argparse.ArgumentParser(description="Hello from wc-tool!")
+    
+    # Add flags
+    parser.add_argument("-c", "--bytes", action="store_true", help="Count bytes")
+    parser.add_argument("-l", "--lines", action="store_true", help="Count number of lines")
+    parser.add_argument("-w", "--words", action="store_true", help="Count number of words")
+    parser.add_argument("-m", "--characters", action="store_true", help="Count number of characters")
+    
+    # Add argument for taking filename as input
+    parser.add_argument("file", help="File to process")
+    
+    # Parse the arguments
+    args = parser.parse_args()
+    
+    # Get the required results
+    result = []
+    if not any([args.bytes, args.lines, args.words, args.characters]):
+        size = count_bytes(args.file)
+        line_count = count_lines(args.file)
+        word_count = count_words(args.file)
+    
+        result.append(str(line_count))
+        result.append(str(word_count))
+        result.append(str(size))
+    
+    else:
+        
+        if args.bytes:
+            size = count_bytes(args.file)
+            result.append(str(size))
+            #print(f"{size} {args.file}")
+        
+        if args.lines:
+            line_count = count_lines(args.file)
+            result.append(str(line_count))
+            #print(f"{line_count} {args.file}")
+        
+        if args.words:
+            word_count = count_words(args.file)
+            result.append(str(word_count))
+            #print(f"{word_count} {args.file}") 
+        
+        if args.characters:
+            char_count = count_characters(args.file)
+            result.append(str(char_count))
+            #print(f"{char_count} {args.file}")
+    
+    print(" ".join(result) + " " + args.file)
 
 # Entry point
 if __name__ == "__main__":
