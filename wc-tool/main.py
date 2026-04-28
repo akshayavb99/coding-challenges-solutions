@@ -28,10 +28,20 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
     
-    # If input arguments includes counting number of bytes
+    # Get the required results
+    result = []
     if args.bytes:
         size = count_bytes(args.file)
-        print(f"{size} {args.file}")
+        result.append(str(size))
+        #print(f"{size} {args.file}")
+    
+    if args.lines:
+        line_count = count_lines(args.file)
+        result.append(str(line_count))
+        #print(f"{line_count} {args.file}")
+    
+    print(" ".join(result) + " " + args.file)
+        
     
 
 def count_bytes(filepath):
@@ -48,7 +58,7 @@ def count_bytes(filepath):
         f.seek(0, 2)   # move to end
         return f.tell()  # byte position = size
 
-def count_lines(filepath):
+def count_lines(filepath, chunk_size=8192):
     """
      Count the number of lines in a file.
 
@@ -56,17 +66,13 @@ def count_lines(filepath):
          filepath (str): Path to the file to measure.
 
      Returns:
-         int: Total number of lines in the file.
+         int: Total number of lines.
      """
-    
-    line_count = 0
-    with open(filepath, "r") as f:
-        line = f.readline()
-        line_count += 1
-        while line:
-            line = f.readline()
-            line_count += 1
-    return line_count
+    count = 0
+    with open(filepath, "rb") as f:
+        while chunk := f.read(chunk_size):
+            count += chunk.count(b"\n")
+    return count
 
 # Entry point
 if __name__ == "__main__":
