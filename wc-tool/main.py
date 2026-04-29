@@ -1,144 +1,137 @@
 #!/usr/bin/env python3
 
 """
- wc-tool: A command-line utility to analyze file properties.
+ccwc - Pipeline-based wc implementation.
+"""
 
- Supports counting bytes, lines in a file, similar to the Unix `wc` command.
- """
+import argparse
+import sys
 
-import argparse # Needed to receive and process the input arguments
 
-def count_bytes(filepath):
+# ============================================================
+# Shared state container
+# ============================================================
+class Counters:
+    """Holds all counting state."""
+    def __init__(self):
+        self.lines = 0
+        self.words = 0
+        self.bytes = 0
+        self.chars = 0
+        self.in_word = False
+
+
+# ============================================================
+# Handlers (pipeline functions)
+# ============================================================
+
+WHITESPACE = b" \t\n\r\v\f"
+
+
+def handle_bytes(state, chunk):
+    """Count raw bytes."""
+    state.bytes += len(chunk)
+
+
+def handle_lines(state, chunk):
+    """Count newline characters."""
+    state.lines += chunk.count(b"\n")
+
+
+def handle_words(state, chunk):
+    """Count words using whitespace transitions."""
+    for b in chunk:
+        if b in WHITESPACE:
+            state.in_word = False
+        else:
+            if not state.in_word:
+                state.words += 1
+                state.in_word = True
+
+
+def handle_chars(state, chunk):
+    """Count Unicode characters (decoded)."""
+    state.chars += len(chunk.decode("utf-8", errors="replace"))
+
+
+# ============================================================
+# Stream processor (pipeline engine)
+# ============================================================
+def process_stream(f, handlers, chunk_size=8192):
     """
-     Count the number of bytes in a file.
+    Run a single-pass pipeline over a stream.
 
-     Args:
-         filepath (str): Path to the file to measure.
+    Args:
+        f: binary stream (file or stdin)
+        handlers: list of functions(state, chunk)
+        chunk_size: read size
 
-     Returns:
-         int: Total size of the file in bytes.
-     """
-    with open(filepath, "rb") as f:
-        f.seek(0, 2)   # move to end
-        return f.tell()  # byte position = size
-
-def count_lines(filepath, chunk_size=8192):
+    Returns:
+        Counters object with results
     """
-     Count the number of lines in a file.
 
-     Args:
-         filepath (str): Path to the file to measure.
+    state = Counters()
 
-     Returns:
-         int: Total number of lines.
-     """
-    count = 0
-    with open(filepath, "rb") as f:
-        while chunk := f.read(chunk_size):
-            count += chunk.count(b"\n")
-    return count
+    while chunk := f.read(chunk_size):
+        for handler in handlers:
+            handler(state, chunk)
 
-def count_words(filepath, chunk_size=8192):
-    """
-     Count the number of words in a file.
-
-     Args:
-         filepath (str): Path to the file to measure.
-
-     Returns:
-         int: Total number of words.
-     """
-    WHITESPACE = set(b" \t\n\r\v\f")
-    in_word = False
-    count = 0
-
-    with open(filepath, "rb") as f:
-        while chunk := f.read(chunk_size):
-            for byte in chunk:
-                if byte in WHITESPACE:
-                    in_word = False
-                else:
-                    if not in_word:
-                        count += 1
-                        in_word = True
-
-    return count
-
-def count_characters(filepath, chunk_size=8192):
-    """
-     Count the number of characters in a file.
-
-     Args:
-         filepath (str): Path to the file to measure.
-
-     Returns:
-         int: Total number of characters (Unicode code points).
-     """
-    count = 0
-
-    with open(filepath, "rb") as f:
-        while chunk := f.read(chunk_size):
-            count += len(chunk.decode("utf-8", errors="replace"))
-
-    return count
+    return state
 
 def main():
-    """
-     Entry point for the wc-tool CLI.
+    parser = argparse.ArgumentParser(description="wc-tool (ccwc) - Python-based wc implementation")
 
-     Parses command-line arguments and dispatches to the appropriate
-     counting function. Prints results to stdout.
-     """
-    # Define argument parser
-    parser = argparse.ArgumentParser(description="Hello from wc-tool!")
-    
-    # Add flags
-    parser.add_argument("-c", "--bytes", action="store_true", help="Count bytes")
-    parser.add_argument("-l", "--lines", action="store_true", help="Count number of lines")
-    parser.add_argument("-w", "--words", action="store_true", help="Count number of words")
-    parser.add_argument("-m", "--characters", action="store_true", help="Count number of characters")
-    
-    # Add argument for taking filename as input
-    parser.add_argument("file", help="File to process")
-    
-    # Parse the arguments
+    parser.add_argument("-c", "--bytes", action="store_true")
+    parser.add_argument("-l", "--lines", action="store_true")
+    parser.add_argument("-w", "--words", action="store_true")
+    parser.add_argument("-m", "--characters", action="store_true")
+
+    parser.add_argument("file", nargs="?", default=None)
+
     args = parser.parse_args()
-    
-    # Get the required results
-    result = []
-    if not any([args.bytes, args.lines, args.words, args.characters]):
-        size = count_bytes(args.file)
-        line_count = count_lines(args.file)
-        word_count = count_words(args.file)
-    
-        result.append(str(line_count))
-        result.append(str(word_count))
-        result.append(str(size))
-    
-    else:
-        
-        if args.bytes:
-            size = count_bytes(args.file)
-            result.append(str(size))
-            #print(f"{size} {args.file}")
-        
-        if args.lines:
-            line_count = count_lines(args.file)
-            result.append(str(line_count))
-            #print(f"{line_count} {args.file}")
-        
-        if args.words:
-            word_count = count_words(args.file)
-            result.append(str(word_count))
-            #print(f"{word_count} {args.file}") 
-        
-        if args.characters:
-            char_count = count_characters(args.file)
-            result.append(str(char_count))
-            #print(f"{char_count} {args.file}")
-    
-    print(" ".join(result) + " " + args.file)
 
-# Entry point
+    # Input source
+    f = open(args.file, "rb") if args.file else sys.stdin.buffer
+
+    with f:
+        handlers = []
+
+        default = not any([args.bytes, args.lines, args.words, args.characters])
+
+        if args.bytes or default:
+            handlers.append(handle_bytes)
+
+        if args.lines or default:
+            handlers.append(handle_lines)
+
+        if args.words or default:
+            handlers.append(handle_words)
+
+        if args.characters:
+            handlers.append(handle_chars)
+            
+        state = process_stream(f, handlers)
+
+    # --------------------------------------------------------
+    # Output formatting
+    # --------------------------------------------------------
+    result = []
+
+    if default:
+        result = [str(state.lines), str(state.words), str(state.bytes)]
+    else:
+        if args.lines:
+            result.append(str(state.lines))
+        if args.words:
+            result.append(str(state.words))
+        if args.bytes:
+            result.append(str(state.bytes))
+        if args.characters:
+            result.append(str(state.chars))
+
+    suffix = f" {args.file}" if args.file else ""
+    print(" ".join(result) + suffix)
+
+
 if __name__ == "__main__":
     main()
