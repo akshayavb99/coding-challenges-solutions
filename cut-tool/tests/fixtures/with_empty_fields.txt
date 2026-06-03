@@ -1,0 +1,4 @@
+name	age	city
+Alice		NYC
+Bob	25
+Charlie	35	Chicago

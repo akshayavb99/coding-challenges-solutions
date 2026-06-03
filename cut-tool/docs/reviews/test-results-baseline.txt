@@ -1,0 +1,89 @@
+Test Run: 2026-06-03 14:30 (BEFORE BUG FIXES)
+============================================
+
+Total Tests: 27
+Passed: 18 (67%)
+Failed: 9 (33%)
+
+FAILED TESTS:
+=============
+
+1. tests\test_cli_arguments.py::TestArgumentParsing::test_fields_flag_required
+   - Expected: Should fail when -f not provided
+   - Actual: Command succeeds even without -f flag
+   - Root Cause: Invalid argument validation (Issue #1)
+
+2. tests\test_cli_arguments.py::TestArgumentParsing::test_fields_argument_with_file
+   - Expected: Should extract field 2 and print age values
+   - Actual: Parser error - tries to parse file path as integer
+   - Root Cause: Argument parsing issue with positional arguments
+
+3. tests\test_cli_arguments.py::TestArgumentParsing::test_multiple_fields
+   - Expected: Should extract fields 1 and 3
+   - Actual: Parser error - tries to parse file path as integer
+   - Root Cause: Argument parsing issue with positional arguments
+
+4. tests\test_cli_arguments.py::TestArgumentParsing::test_custom_delimiter
+   - Expected: Should extract field 2 with comma delimiter
+   - Actual: Returns 'Hello from cut-tool!' in output
+   - Root Cause: Debug print statement interferes with output
+
+5. tests\test_cli_arguments.py::TestArgumentParsing::test_default_delimiter_is_tab
+   - Expected: Should use tab as default delimiter
+   - Actual: Parser error - tries to parse file path as integer
+   - Root Cause: Argument parsing issue with positional arguments
+
+6. tests\test_field_extraction.py::TestFileHandling::test_file_not_found
+   - Expected: Should raise FileNotFoundError
+   - Actual: DID NOT RAISE exception
+   - Root Cause: Exception handling returns exception object (Issue #2)
+
+7. tests\test_field_extraction.py::TestFileHandling::test_file_permissions_error
+   - Expected: Should raise PermissionError
+   - Actual: DID NOT RAISE exception
+   - Root Cause: Exception handling returns exception object (Issue #2)
+
+8. tests\test_field_extraction.py::TestOutputFormatting::test_output_delimiter_matches_input
+   - Expected: output[1] == 'name,age'
+   - Actual: output[1] == 'Alice,30'
+   - Note: Test assertion issue (checking wrong line), but exposes code works correctly
+
+PASSED TESTS (18):
+==================
+
+Core functionality tests that pass:
+✓ test_extract_single_field_tab_delimited
+✓ test_extract_first_field_tab_delimited
+✓ test_extract_last_field_tab_delimited
+✓ test_extract_multiple_fields_in_order
+✓ test_extract_multiple_fields_unordered
+✓ test_comma_delimiter
+✓ test_pipe_delimiter
+✓ test_default_tab_delimiter
+✓ test_empty_file
+✓ test_single_line_file
+✓ test_field_out_of_bounds
+✓ test_missing_field_in_some_lines
+✓ test_duplicate_field_selection
+✓ test_line_without_trailing_newline
+✓ test_field_order_preserved
+
+CLI tests that pass (mostly error cases):
+✓ test_file_not_found_error
+✓ test_help_flag
+✓ test_missing_file_argument
+✓ test_invalid_field_number
+
+CONCLUSION:
+===========
+
+The CutTool class itself works correctly for the core functionality.
+The bugs are in the main() function's argument handling and error handling:
+
+1. Argument validation logic is inverted
+2. Exception handling pattern is wrong
+3. Missing -f flag validation
+4. Debug print statement in production code
+
+The test suite successfully identifies all the issues found in the manual review
+and provides a foundation for verifying fixes.
