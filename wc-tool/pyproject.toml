@@ -1,5 +1,5 @@
 [project]
-name = "cwcc"
+name = "ccwc"
 version = "0.1.0"
 description = "Simple wc clone for counting bytes, lines in a file"
 readme = "README.md"
