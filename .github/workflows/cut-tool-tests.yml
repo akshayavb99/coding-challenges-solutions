@@ -1,0 +1,42 @@
+name: Cut Tool Tests
+
+on:
+  push:
+    paths:
+      - "cut-tool/**"
+      - ".github/workflows/cut-tool-tests.yml"
+  pull_request:
+    paths:
+      - "cut-tool/**"
+      - ".github/workflows/cut-tool-tests.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Python tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: cut-tool
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: cut-tool/uv.lock
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: cut-tool/.python-version
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run tests
+        run: uv run pytest
