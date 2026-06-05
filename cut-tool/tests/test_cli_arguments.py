@@ -161,3 +161,74 @@ class TestErrorHandling:
 
         # Should fail due to invalid integer
         assert result.returncode != 0
+
+
+class TestStdinProcessing:
+    """Test stdin input processing"""
+
+    def test_stdin_input_basic(self):
+        """Test reading and processing stdin input"""
+        input_data = "name\tage\tcity\nAlice\t30\tNYC\nBob\t25\tLA\n"
+
+        result = subprocess.run(
+            [sys.executable, "-m", "main", "-f", "2"],
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            input=input_data,
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        lines = result.stdout.strip().split('\n')
+        assert lines[0] == 'age'
+        assert lines[1] == '30'
+        assert lines[2] == '25'
+
+    def test_stdin_with_custom_delimiter(self):
+        """Test stdin input with custom delimiter"""
+        input_data = "name,age,city\nAlice,30,NYC\nBob,25,LA\n"
+
+        result = subprocess.run(
+            [sys.executable, "-m", "main", "-f", "2", "-d", ","],
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            input=input_data,
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        lines = result.stdout.strip().split('\n')
+        assert lines[0] == 'age'
+        assert lines[1] == '30'
+
+    def test_stdin_multiple_fields(self):
+        """Test stdin input with multiple fields"""
+        input_data = "a\tb\tc\nd\te\tf\n"
+
+        result = subprocess.run(
+            [sys.executable, "-m", "main", "-f", "1,3"],
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            input=input_data,
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        lines = result.stdout.strip().split('\n')
+        assert lines[0] == 'a\tc'
+        assert lines[1] == 'd\tf'
+
+    def test_stdin_empty_input(self):
+        """Test handling of empty stdin"""
+        input_data = ""
+
+        result = subprocess.run(
+            [sys.executable, "-m", "main", "-f", "1"],
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            input=input_data,
+            capture_output=True,
+            text=True
+        )
+
+        assert result.returncode == 0
+        assert result.stdout == ""
