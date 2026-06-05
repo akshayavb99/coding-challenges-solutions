@@ -133,12 +133,13 @@ class TestEdgeCases:
         assert result[2] == '25'
 
     def test_duplicate_field_selection(self, sample_tab_file):
-        """Request same field multiple times"""
+        """Request same field multiple times - duplicates are deduplicated"""
         tool = CutTool(fields="1,1,1", delimiter='\t', input_content=sample_tab_file)
         result = tool.get_result()
 
-        assert result[0] == 'name\tname\tname'
-        assert result[1] == 'Alice\tAlice\tAlice'
+        # Duplicate field indices are deduplicated to match Unix cut behavior
+        assert result[0] == 'name'
+        assert result[1] == 'Alice'
 
     def test_line_without_trailing_newline(self, sample_tab_file):
         """Handle last line without trailing newline correctly"""
